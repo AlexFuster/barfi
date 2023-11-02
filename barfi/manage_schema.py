@@ -30,7 +30,7 @@ class SchemaManager:
         except FileNotFoundError:
             schemas = {}
 
-        with open(self.schema_path, 'wb') as handle_write:
+        with open(self.schema_path, 'w') as handle_write:
             schemas[schema_name] = schema_data
             json.dump(schemas, handle_write)
 
@@ -58,5 +58,5 @@ class SchemaManager:
             raise ValueError(
                 f'Schema :{schema_name}: not found in the saved schemas')
         
-        with open(self.schema_path, 'wb') as handle_write:
+        with open(self.schema_path, 'w') as handle_write:
             json.dump(schemas, handle_write)
