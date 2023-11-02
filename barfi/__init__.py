@@ -4,7 +4,7 @@ from typing import List, Dict, Union
 # import barfi components
 from .block_builder import Block
 from .compute_engine import ComputeEngine
-from .manage_schema import load_schema_name, load_schemas, save_schema
+from .manage_schema import SchemaManager
 from .manage_schema import editor_preset
 
 import os
@@ -46,13 +46,15 @@ else:
 # "name" argument without having it get recreated.
 
 
-def st_barfi(base_blocks: Union[List[Block], Dict], load_schema: str = None, compute_engine: bool = True, key=None):
+def st_barfi(base_blocks: Union[List[Block], Dict], load_schema: str = None, compute_engine: bool = True, key=None, schema_manager=None):
+    if schema_manager is None:
+        schema_manager=SchemaManager()
     if load_schema:
-        editor_schema = load_schema_name(load_schema)
+        editor_schema = schema_manager.load_schema_name(load_schema)
     else:
         editor_schema = None
 
-    schemas_in_db = load_schemas()
+    schemas_in_db = schema_manager.load_schemas()
     schema_names_in_db = schemas_in_db['schema_names']
 
     editor_setting = {'compute_engine': compute_engine}
@@ -97,19 +99,21 @@ def st_barfi(base_blocks: Union[List[Block], Dict], load_schema: str = None, com
             # return _ce.get_result()
             return _from_client
     if _from_client['command'] == 'save':
-        save_schema(
+        schema_manager.save_schema(
             schema_name=_from_client['schema_name'], schema_data=_from_client['editor_state'])
     if _from_client['command'] == 'load':
         load_schema = _from_client['schema_name']
-        editor_schema = load_schema_name(load_schema)
+        editor_schema = schema_manager.load_schema_name(load_schema)
     else:
         pass
 
     return {}
 
 
-def barfi_schemas():
-    schemas_in_db = load_schemas()
+def barfi_schemas(schema_manager=None):
+    if schema_manager is None:
+        schema_manager=SchemaManager()
+    schemas_in_db = schema_manager.load_schemas()
     schema_names_in_db = schemas_in_db['schema_names']
 
     return schema_names_in_db
